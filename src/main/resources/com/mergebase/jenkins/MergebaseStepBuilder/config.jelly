@@ -1,0 +1,28 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <img src="/plugin/mergebase-jenkins-plugin/img/mb-logo-and-name.png"/>
+    <f:entry title="Project name" field="projectName">
+        <f:textbox />
+    </f:entry>
+    <f:entry title="Path to scan (default is '.')" field="mbScanPath">
+        <f:textbox />
+    </f:entry>
+    <f:entry title="MergeBase Dashboard URL" field="domain">
+        <f:textbox />
+    </f:entry>
+    <f:entry title="Customer Token" field="customerToken">
+        <f:textbox />
+    </f:entry>
+    <f:entry title="Severity Threshold" field="severityThreshold">
+        <f:textbox />
+    </f:entry>
+    <f:entry title="Scan All Projects recursively" field="scanAll">
+        <f:checkbox />
+    </f:entry>
+    <f:entry title="Enable Debug Mode" field="debugMode">
+        <f:checkbox />
+    </f:entry>
+    <f:entry title="Enable JSON output" field="jsonOutput">
+        <f:checkbox />
+    </f:entry>
+</j:jelly>
