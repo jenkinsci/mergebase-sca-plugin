@@ -11,7 +11,7 @@
     <artifactId>mergebase-sca</artifactId>
     <version>${revision}${changelist}</version>
     <packaging>hpi</packaging>
-    <name>MergeBase Jenkins Build Step</name>
+    <name>MergeBase SCA Plugin</name>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     <licenses>
         <license>
