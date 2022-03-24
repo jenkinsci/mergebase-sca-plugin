@@ -2,23 +2,44 @@
 
 ## Introduction
 
-TODO Describe what your plugin does here
+Scan your Source Code for vulnerabilities with MergeBase. Officially supported by MergeBase Software.
 
 ## Getting started
 
-TODO Tell users how to configure your plugin here, include screenshots, pipeline examples and 
-configuration-as-code examples.
+### Required Parameters
+The following parameters are required. The values in parentheses is used in pipeline workflow configuration.
 
-## Issues
+Project Name (projectName):
+A unique name for your project. This will be the name that represents the project in the MergeBase Dashboard.
 
-TODO Decide where you're going to host your issues, the default is Jenkins JIRA, but you can also enable GitHub issues,
-If you use GitHub issues there's no need for this section; else add the following line:
+MergeBase Dashboard URL (url):
+Add your dashboard URL in the form https://[your-organization].mergebase.com . If you have an on-premise installation, use your custom URL.
 
-Report issues and enhancements in the [Jenkins issue tracker](https://issues.jenkins-ci.org/).
+Customer Token (customerToken):
+Your API token from your Dashboard. This can be found on the Settings page.
+
+### Optional Parameters
+The values in parentheses is used in pipeline workflow configuration.
+
+Severity Threshold (severityThreshold):
+Vulnerabilities below the following CVSS/Risk Score threshold are ignored. (between 0.0 - 10.0)
+
+Path to scan(mbScanPath):
+This defaults to `./`. It can be modified for your project's setup.
+
+Scan all projects found (scanAll): 
+Scan the build directory recursively to find all projects with compatible build files. This defaults to false, and the MergeBase scanner will select the first build file it find in the current directory or the specific file if you have selected a file-path. 
+
+Enable Debug logging (debugMode):
+Enables debug output for use in troubleshooting.
+
+Enable JSON output (jsonOutput):
+Outputs the MergeBase report in JSON form for use in automation.
+
+### Freestyle Projects
+In a freestyle project, add "MergeBase SCA Scan" build step. Add the required parameters as listed above.  
 
 ## Contributing
-
-TODO review the default [CONTRIBUTING](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md) file and make sure it is appropriate for your plugin, if not then add your own one adapted from the base file
 
 Refer to our [contribution guidelines](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md)
 
