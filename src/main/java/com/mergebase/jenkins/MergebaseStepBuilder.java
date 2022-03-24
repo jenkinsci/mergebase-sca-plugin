@@ -32,7 +32,7 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
 //    public static final String MB_CUSTOMER = "mb.customer";
 //    public static final String MB_URL = "mb.url";
 
-    private String domain;
+    private String url;
     private String customerToken;
     private String projectName;
     private String severityThreshold;
@@ -40,19 +40,21 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
     private boolean scanAll;
     private boolean debugMode;
     private boolean jsonOutput;
+    private boolean killBuild;
 
     private static final Logger LOG = LoggerFactory.getLogger(MergebaseStepBuilder.class);
 
     @DataBoundConstructor
-    public MergebaseStepBuilder(final String domain,
+    public MergebaseStepBuilder(final String url,
                                 final String customerToken,
                                 final String projectName,
                                 final String severityThreshold,
                                 final String mbScanPath,
                                 boolean scanAll,
                                 boolean debugMode,
-                                boolean jsonOutput) {
-        this.domain = domain;
+                                boolean jsonOutput,
+                                boolean killBuild) {
+        this.url = url;
         this.customerToken = customerToken;
         this.projectName = projectName;
         this.severityThreshold = severityThreshold;
@@ -60,13 +62,14 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
         this.scanAll = scanAll;
         this.debugMode = debugMode;
         this.jsonOutput = jsonOutput;
+        this.killBuild = killBuild;
     }
 
     public MergebaseStepBuilder(){}
 
     @DataBoundSetter
-    public void setDomain(String domain) {
-        this.domain = domain;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     @DataBoundSetter
@@ -104,8 +107,13 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
         this.jsonOutput = jsonOutput;
     }
 
-    public String getDomain() {
-        return domain;
+    @DataBoundSetter
+    public void setKillBuild(boolean killBuild) {
+        this.killBuild = killBuild;
+    }
+
+    public String getUrl() {
+        return url;
     }
 
     public String getCustomerToken() {
@@ -132,6 +140,14 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
         return jsonOutput;
     }
 
+    public String getMbScanPath() {
+        return mbScanPath;
+    }
+
+    public boolean isKillBuild() {
+        return killBuild;
+    }
+
     @Override
     public void perform(Run<?, ?> run, FilePath workspace, EnvVars env, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
         URL res = getClass().getClassLoader().getResource("mergebase.jar");
@@ -142,12 +158,13 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
             GenericRunContext genericRunContext = GenericRunContext.forFreestyleProject(run, workspace, launcher, listener);
             MergebaseConfig mergebaseConfig = new MergebaseConfig();
             mergebaseConfig.setCustomerToken(customerToken);
-            mergebaseConfig.setDomain(domain);
+            mergebaseConfig.setDomain(url);
             mergebaseConfig.setProjectName(projectName);
             mergebaseConfig.setSeverityThreshold(severityThreshold);
             mergebaseConfig.setEnableScanAll(scanAll);
             mergebaseConfig.setEnableDebugMode(debugMode);
             mergebaseConfig.setEnableJsonOutput(jsonOutput);
+            mergebaseConfig.setKillBuild(killBuild);
             String tmpPath = mbScanPath;
             if(mbScanPath == null  || mbScanPath.equals("")){
                 tmpPath = ".";
@@ -177,7 +194,7 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
             return FormValidation.ok();
         }
 
-        public FormValidation doCheckDomain(@QueryParameter String value) {
+        public FormValidation doCheckUrl(@QueryParameter String value) {
             value = fixEmptyAndTrim(value);
             if(value == null) {
                 return FormValidation.errorWithMarkup("You must add your MergeBase Dashboard URL. URL must be entered in the form <code>https://[your-domain].mergebase.com </code>.");

@@ -59,6 +59,10 @@ public class MergeBaseRun {
         if(mergebaseConfig.isEnableJsonOutput()) {
             args.add("--json");
         }
+
+        if(!mergebaseConfig.isKillBuild()) {
+            args.add("--exitZero");
+        }
         args.add("--name=" + mergebaseConfig.getProjectName());
         args.add(mergebaseConfig.getScanPath());
         return args;

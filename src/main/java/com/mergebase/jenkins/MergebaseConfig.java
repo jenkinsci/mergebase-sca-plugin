@@ -8,6 +8,7 @@ public class MergebaseConfig {
     private boolean enableScanAll;
     private boolean enableDebugMode;
     private boolean enableJsonOutput;
+    private boolean killBuild;
     private String scanPath;
 
     public MergebaseConfig(){}
@@ -66,6 +67,14 @@ public class MergebaseConfig {
 
     public void setEnableJsonOutput(boolean enableJsonOutput) {
         this.enableJsonOutput = enableJsonOutput;
+    }
+
+    public boolean isKillBuild() {
+        return killBuild;
+    }
+
+    public void setKillBuild(boolean killBuild) {
+        this.killBuild = killBuild;
     }
 
     public String getScanPath() {

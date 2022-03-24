@@ -7,21 +7,25 @@
     <f:entry title="Path to scan (default is '.')" field="mbScanPath">
         <f:textbox />
     </f:entry>
-    <f:entry title="MergeBase Dashboard URL" field="domain">
+    <f:entry title="MergeBase Dashboard URL" field="url">
         <f:textbox />
     </f:entry>
     <f:entry title="Customer Token" field="customerToken">
         <f:textbox />
     </f:entry>
-    <f:entry title="Severity Threshold" field="severityThreshold">
+    <f:entry title="Scan All Projects found" field="scanAll">
+        <f:checkbox />
+    </f:entry>
+    <f:entry title="Vulnerabilities Below the following CVSS threshold are ignored. (between 0.0 - 10.0)" field="severityThreshold">
         <f:textbox />
     </f:entry>
-    <f:entry title="Scan All Projects recursively" field="scanAll">
+    <f:entry title="Kill the build if vulnerabilities are found" field="killBuild">
         <f:checkbox />
     </f:entry>
     <f:entry title="Enable Debug Mode" field="debugMode">
         <f:checkbox />
     </f:entry>
+
     <f:entry title="Enable JSON output" field="jsonOutput">
         <f:checkbox />
     </f:entry>
