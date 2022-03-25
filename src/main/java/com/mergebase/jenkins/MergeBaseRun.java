@@ -18,8 +18,7 @@ import java.util.stream.Collectors;
 public class MergeBaseRun {
     public static String scanProject(
             GenericRunContext context,
-            MergebaseConfig mergebaseConfig,
-            Path mbJarLocation
+            MergebaseConfig mergebaseConfig
     ) throws MergebaseException, IOException {
         PrintStream logger = context.getTaskListener().getLogger();
         FilePath workspace = context.getWorkspace();

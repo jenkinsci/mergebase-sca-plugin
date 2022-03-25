@@ -23,11 +23,15 @@ public class ToolDownloader {
         if it's not present.
      */
     public static void ensureWrapperDownload(final String wrapperPath)  throws MergebaseException, IOException {
+        File folder = new File(wrapperPath);
+        File file = new File(wrapperPath + "/mergebase.jar");
+        // set to actual file name
+        if(file.exists()) {
+            return;
+        }
         try(InputStream is = httpGet(JAR_URL, false)) {
-            File file = new File(wrapperPath);
-            file.mkdirs();
+            folder.mkdirs();
             // set to actual file name
-            file = new File(wrapperPath + "/mergebase.jar");
             streamToFile(is, file, false);
         } catch (Throwable e) {
             throw new MergebaseException(e);

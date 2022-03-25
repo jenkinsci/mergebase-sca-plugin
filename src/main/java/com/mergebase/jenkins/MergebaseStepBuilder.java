@@ -163,11 +163,7 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
 
     @Override
     public void perform(Run<?, ?> run, FilePath workspace, EnvVars env, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
-        URL res = getClass().getClassLoader().getResource("mergebase.jar");
-        Path file = null;
         try {
-            assert res != null;
-            file = Paths.get(res.toURI());
             GenericRunContext genericRunContext = GenericRunContext.forFreestyleProject(run, workspace, launcher, listener);
             MergebaseConfig mergebaseConfig = new MergebaseConfig();
             mergebaseConfig.setCustomerToken(customerToken);
@@ -186,9 +182,8 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
             mergebaseConfig.setScanPath(tmpPath);
             mergebaseConfig.setEnableDebugMode(false);
             mergebaseConfig.setEnableScanAll(false);
-            MergeBaseRun.scanProject(genericRunContext, mergebaseConfig, file);
-        } catch (URISyntaxException | MergebaseException e) {
-            //e.printStackTrace();
+            MergeBaseRun.scanProject(genericRunContext, mergebaseConfig);
+        } catch (MergebaseException e) {
             throw new InterruptedException(e.getLocalizedMessage());
         }
     }

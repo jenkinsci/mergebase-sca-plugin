@@ -27,21 +27,19 @@ import java.util.Set;
 
 public class MergebasePipelineStep  extends Step {
 
-    private String domain;
+    private String url;
     private String customerToken;
     private String projectName;
     private String severityThreshold;
-    private String scanPath;
+    private String mbScanPath;
+    private String wrapperPath;
     private boolean scanAll;
     private boolean debugMode;
+    private boolean jsonOutput;
+    private boolean killBuild;
 
     @DataBoundConstructor
     public MergebasePipelineStep() {
-    }
-
-
-    public String getDomain() {
-        return domain;
     }
 
     public String getCustomerToken() {
@@ -56,10 +54,6 @@ public class MergebasePipelineStep  extends Step {
         return severityThreshold;
     }
 
-    public String getScanPath() {
-        return scanPath;
-    }
-
     public boolean isScanAll() {
         return scanAll;
     }
@@ -68,9 +62,49 @@ public class MergebasePipelineStep  extends Step {
         return debugMode;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public String getMbScanPath() {
+        return mbScanPath;
+    }
+
+    public String getWrapperPath() {
+        return wrapperPath;
+    }
+
+    public boolean isJsonOutput() {
+        return jsonOutput;
+    }
+
+    public boolean isKillBuild() {
+        return killBuild;
+    }
+
     @DataBoundSetter
-    public void setDomain(String domain) {
-        this.domain = domain;
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    @DataBoundSetter
+    public void setMbScanPath(String mbScanPath) {
+        this.mbScanPath = mbScanPath;
+    }
+
+    @DataBoundSetter
+    public void setWrapperPath(String wrapperPath) {
+        this.wrapperPath = wrapperPath;
+    }
+
+    @DataBoundSetter
+    public void setJsonOutput(boolean jsonOutput) {
+        this.jsonOutput = jsonOutput;
+    }
+
+    @DataBoundSetter
+    public void setKillBuild(boolean killBuild) {
+        this.killBuild = killBuild;
     }
 
     @DataBoundSetter
@@ -88,10 +122,6 @@ public class MergebasePipelineStep  extends Step {
         this.severityThreshold = severityThreshold;
     }
 
-    @DataBoundSetter
-    public void setScanPath(String scanPath) {
-        this.scanPath = scanPath;
-    }
 
     @DataBoundSetter
     public void setScanAll(boolean scanAll) {
@@ -117,10 +147,9 @@ public class MergebasePipelineStep  extends Step {
         }
 
         @Override
-        protected Void run() throws IOException, URISyntaxException, MergebaseException {
-            URL res = getClass().getClassLoader().getResource("mergebase.jar");
+        protected Void run() throws IOException, MergebaseException {
             MergebaseConfig mergebaseConfig = new MergebaseConfig();
-            MergeBaseRun.scanProject(GenericRunContext.forPipelineProject(getContext()), mergebaseConfig, Paths.get(res.toURI()));
+            MergeBaseRun.scanProject(GenericRunContext.forPipelineProject(getContext()), mergebaseConfig);
             return null;
         }
     }
