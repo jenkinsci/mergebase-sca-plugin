@@ -29,10 +29,6 @@ import static hudson.Util.fixEmptyAndTrim;
 
 public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
 
-//    private static final String CLT_PROPERTIES = "mergebase.clt.properties";
-//    public static final String MB_CUSTOMER = "mb.customer";
-//    public static final String MB_URL = "mb.url";
-
     private String url;
     private String customerToken;
     private String projectName;

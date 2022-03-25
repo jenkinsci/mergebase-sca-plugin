@@ -1,6 +1,8 @@
 package com.mergebase.jenkins;
 
-public class MergebaseConfig {
+import java.io.Serializable;
+
+public class MergebaseConfig implements Serializable {
     private String domain;
     private String customerToken;
     private String projectName;

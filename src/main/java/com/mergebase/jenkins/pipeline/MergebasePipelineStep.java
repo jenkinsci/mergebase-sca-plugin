@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static hudson.Util.fixEmptyAndTrim;
+
 public class MergebasePipelineStep  extends Step {
 
     private String url;
@@ -135,20 +137,38 @@ public class MergebasePipelineStep  extends Step {
 
     @Override
     public StepExecution start(StepContext stepContext) throws Exception {
-        return new Execution(stepContext);
+        MergebaseConfig mergebaseConfig = new MergebaseConfig();
+        mergebaseConfig.setCustomerToken(customerToken);
+        mergebaseConfig.setDomain(url);
+        mergebaseConfig.setProjectName(projectName);
+        mergebaseConfig.setSeverityThreshold(severityThreshold);
+        mergebaseConfig.setEnableScanAll(scanAll);
+        mergebaseConfig.setEnableDebugMode(debugMode);
+        mergebaseConfig.setEnableJsonOutput(jsonOutput);
+        mergebaseConfig.setKillBuild(killBuild);
+        mergebaseConfig.setWrapperPath(fixEmptyAndTrim(wrapperPath));
+        String tmpPath = mbScanPath;
+        if(mbScanPath == null  || mbScanPath.equals("")){
+            tmpPath = ".";
+        }
+        mergebaseConfig.setScanPath(tmpPath);
+        mergebaseConfig.setEnableDebugMode(false);
+        mergebaseConfig.setEnableScanAll(false);
+        return new Execution(stepContext, mergebaseConfig);
     }
 
 
     public static class Execution extends SynchronousNonBlockingStepExecution<Void> {
         private static final long serialVersionUID = 2L;
+        private MergebaseConfig mergebaseConfig;
 
-        public Execution(StepContext context) {
+        public Execution(StepContext context, MergebaseConfig mergebaseConfig) {
             super(context);
+            this.mergebaseConfig = mergebaseConfig;
         }
 
         @Override
         protected Void run() throws IOException, MergebaseException {
-            MergebaseConfig mergebaseConfig = new MergebaseConfig();
             MergeBaseRun.scanProject(GenericRunContext.forPipelineProject(getContext()), mergebaseConfig);
             return null;
         }
