@@ -1,6 +1,5 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-    <img src="/plugin/mergebase-jenkins-plugin/img/mb-logo-and-name.png"/>
     <f:entry title="Project name" field="projectName">
         <f:textbox />
     </f:entry>
