@@ -10,6 +10,7 @@ public class MergebaseConfig {
     private boolean enableJsonOutput;
     private boolean killBuild;
     private String scanPath;
+    private String wrapperPath;
 
     public MergebaseConfig(){}
 
@@ -83,5 +84,13 @@ public class MergebaseConfig {
 
     public void setScanPath(String scanPath) {
         this.scanPath = scanPath;
+    }
+
+    public String getWrapperPath() {
+        return wrapperPath;
+    }
+
+    public void setWrapperPath(String wrapperPath) {
+        this.wrapperPath = wrapperPath;
     }
 }

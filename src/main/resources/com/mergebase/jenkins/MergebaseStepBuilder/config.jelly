@@ -25,8 +25,10 @@
     <f:entry title="Enable Debug Mode" field="debugMode">
         <f:checkbox />
     </f:entry>
-
     <f:entry title="Enable JSON output" field="jsonOutput">
         <f:checkbox />
+    </f:entry>
+    <f:entry title="Download Location for Mergebase CLT JAR. If left blank, default is $HOME/.mergebase" field="wrapperPath">
+        <f:textbox />
     </f:entry>
 </j:jelly>

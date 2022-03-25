@@ -1,5 +1,6 @@
 package com.mergebase.jenkins;
 
+import com.mergebase.jenkins.execption.MergebaseException;
 import hudson.Launcher;
 import hudson.EnvVars;
 import hudson.Extension;
@@ -37,6 +38,7 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
     private String projectName;
     private String severityThreshold;
     private String mbScanPath;
+    private String wrapperPath;
     private boolean scanAll;
     private boolean debugMode;
     private boolean jsonOutput;
@@ -50,6 +52,7 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
                                 final String projectName,
                                 final String severityThreshold,
                                 final String mbScanPath,
+                                final String wrapperPath,
                                 boolean scanAll,
                                 boolean debugMode,
                                 boolean jsonOutput,
@@ -59,6 +62,7 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
         this.projectName = projectName;
         this.severityThreshold = severityThreshold;
         this.mbScanPath = mbScanPath;
+        this.wrapperPath = wrapperPath;
         this.scanAll = scanAll;
         this.debugMode = debugMode;
         this.jsonOutput = jsonOutput;
@@ -112,6 +116,11 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
         this.killBuild = killBuild;
     }
 
+    @DataBoundSetter
+    public void setWrapperPath(String wrapperPath) {
+        this.wrapperPath = wrapperPath;
+    }
+
     public String getUrl() {
         return url;
     }
@@ -148,6 +157,10 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
         return killBuild;
     }
 
+    public String getWrapperPath() {
+        return wrapperPath;
+    }
+
     @Override
     public void perform(Run<?, ?> run, FilePath workspace, EnvVars env, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
         URL res = getClass().getClassLoader().getResource("mergebase.jar");
@@ -165,6 +178,7 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
             mergebaseConfig.setEnableDebugMode(debugMode);
             mergebaseConfig.setEnableJsonOutput(jsonOutput);
             mergebaseConfig.setKillBuild(killBuild);
+            mergebaseConfig.setWrapperPath(fixEmptyAndTrim(wrapperPath));
             String tmpPath = mbScanPath;
             if(mbScanPath == null  || mbScanPath.equals("")){
                 tmpPath = ".";
@@ -173,7 +187,7 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
             mergebaseConfig.setEnableDebugMode(false);
             mergebaseConfig.setEnableScanAll(false);
             MergeBaseRun.scanProject(genericRunContext, mergebaseConfig, file);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException | MergebaseException e) {
             //e.printStackTrace();
             throw new InterruptedException(e.getLocalizedMessage());
         }

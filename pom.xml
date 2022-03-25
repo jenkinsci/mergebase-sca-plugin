@@ -19,14 +19,14 @@
             <url>https://opensource.org/licenses/MIT</url>
         </license>
     </licenses>
-    <!-- If you want this to appear on the plugin site page:
+
     <developers>
         <developer>
-            <id>bhacker</id>
-            <name>Bob Q. Hacker</name>
-            <email>bhacker@nowhere.net</email>
+            <id>delanAtMergebase</id>
+            <name>Delan Elliot</name>
+            <email>delan@mergebase.com</email>
         </developer>
-    </developers> -->
+    </developers>
 
     <scm child.scm.connection.inherit.append.path="false"
          child.scm.developerConnection.inherit.append.path="false"

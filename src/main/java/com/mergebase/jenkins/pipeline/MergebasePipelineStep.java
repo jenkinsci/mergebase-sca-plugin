@@ -4,6 +4,7 @@ import com.mergebase.jenkins.GenericRunContext;
 import com.mergebase.jenkins.MergeBaseRun;
 import com.mergebase.jenkins.MergebaseConfig;
 import com.mergebase.jenkins.MergebaseStepBuilder;
+import com.mergebase.jenkins.execption.MergebaseException;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.rmi.MarshalException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -115,7 +117,7 @@ public class MergebasePipelineStep  extends Step {
         }
 
         @Override
-        protected Void run() throws IOException, URISyntaxException {
+        protected Void run() throws IOException, URISyntaxException, MergebaseException {
             URL res = getClass().getClassLoader().getResource("mergebase.jar");
             MergebaseConfig mergebaseConfig = new MergebaseConfig();
             MergeBaseRun.scanProject(GenericRunContext.forPipelineProject(getContext()), mergebaseConfig, Paths.get(res.toURI()));
