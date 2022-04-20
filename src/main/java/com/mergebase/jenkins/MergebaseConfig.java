@@ -1,10 +1,10 @@
 package com.mergebase.jenkins;
 
-import java.io.Serializable;
+import hudson.util.Secret;
 
-public class MergebaseConfig implements Serializable {
+public class MergebaseConfig {
     private String domain;
-    private String customerToken;
+    private Secret customerToken;
     private String projectName;
     private String severityThreshold;
     private boolean enableScanAll;
@@ -24,11 +24,11 @@ public class MergebaseConfig implements Serializable {
         this.domain = domain;
     }
 
-    public String getCustomerToken() {
+    public Secret getCustomerToken() {
         return customerToken;
     }
 
-    public void setCustomerToken(String customerToken) {
+    public void setCustomerToken(Secret customerToken) {
         this.customerToken = customerToken;
     }
 

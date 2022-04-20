@@ -5,14 +5,17 @@ import hudson.Launcher;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.model.Result;
 import hudson.util.FormValidation;
 import hudson.model.AbstractProject;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.Builder;
 import hudson.tasks.BuildStepDescriptor;
+import hudson.util.Secret;
 import io.jenkins.cli.shaded.org.slf4j.Logger;
 import io.jenkins.cli.shaded.org.slf4j.LoggerFactory;
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
@@ -25,16 +28,15 @@ import java.nio.file.Paths;
 import java.util.Locale;
 
 import jenkins.tasks.SimpleBuildStep;
+import org.kohsuke.stapler.StaplerRequest;
+
 import static hudson.Util.fixEmptyAndTrim;
 
 public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
 
-    private String url;
-    private String customerToken;
     private String projectName;
     private String severityThreshold;
     private String mbScanPath;
-    private String wrapperPath;
     private boolean scanAll;
     private boolean debugMode;
     private boolean jsonOutput;
@@ -43,22 +45,17 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
     private static final Logger LOG = LoggerFactory.getLogger(MergebaseStepBuilder.class);
 
     @DataBoundConstructor
-    public MergebaseStepBuilder(final String url,
-                                final String customerToken,
-                                final String projectName,
+    public MergebaseStepBuilder(final String projectName,
                                 final String severityThreshold,
                                 final String mbScanPath,
-                                final String wrapperPath,
                                 boolean scanAll,
                                 boolean debugMode,
                                 boolean jsonOutput,
                                 boolean killBuild) {
-        this.url = url;
-        this.customerToken = customerToken;
+
         this.projectName = projectName;
         this.severityThreshold = severityThreshold;
         this.mbScanPath = mbScanPath;
-        this.wrapperPath = wrapperPath;
         this.scanAll = scanAll;
         this.debugMode = debugMode;
         this.jsonOutput = jsonOutput;
@@ -66,16 +63,6 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
     }
 
     public MergebaseStepBuilder(){}
-
-    @DataBoundSetter
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    @DataBoundSetter
-    public void setCustomerToken(String customerToken) {
-        this.customerToken = customerToken;
-    }
 
     @DataBoundSetter
     public void setSeverityThreshold(String severityThreshold) {
@@ -112,17 +99,14 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
         this.killBuild = killBuild;
     }
 
-    @DataBoundSetter
-    public void setWrapperPath(String wrapperPath) {
-        this.wrapperPath = wrapperPath;
-    }
-
     public String getUrl() {
-        return url;
+        MergebaseStepBuilderDescriptor mergebaseStepBuilderDescriptor = (MergebaseStepBuilderDescriptor) super.getDescriptor();
+        return mergebaseStepBuilderDescriptor.getUrl();
     }
 
-    public String getCustomerToken() {
-        return customerToken;
+    public Secret getCustomerToken() {
+        MergebaseStepBuilderDescriptor mergebaseStepBuilderDescriptor = (MergebaseStepBuilderDescriptor) super.getDescriptor();
+        return mergebaseStepBuilderDescriptor.getCustomerToken();
     }
 
     public String getSeverityThreshold() {
@@ -154,42 +138,62 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
     }
 
     public String getWrapperPath() {
-        return wrapperPath;
+        MergebaseStepBuilderDescriptor mergebaseStepBuilderDescriptor = (MergebaseStepBuilderDescriptor) super.getDescriptor();
+        return mergebaseStepBuilderDescriptor.getWrapperPath();
     }
 
     @Override
     public void perform(Run<?, ?> run, FilePath workspace, EnvVars env, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
         try {
+            if(fixEmptyAndTrim(getUrl()) == null) {
+                throw new InterruptedException("Please ensure you have set your MergeBase dashboard URL in Global Settings. Contact an administrator for more information.");
+            }
+
+            if(fixEmptyAndTrim(getCustomerToken().getPlainText()) == null) {
+                throw new InterruptedException("Please ensure you have set your MergeBase Customer Token in Global Settings. Contact an administrator for more information.");
+            }
+
             GenericRunContext genericRunContext = GenericRunContext.forFreestyleProject(run, workspace, launcher, listener);
             MergebaseConfig mergebaseConfig = new MergebaseConfig();
-            mergebaseConfig.setCustomerToken(customerToken);
-            mergebaseConfig.setDomain(url);
+            mergebaseConfig.setCustomerToken(getCustomerToken());
+            mergebaseConfig.setDomain(getUrl());
             mergebaseConfig.setProjectName(projectName);
             mergebaseConfig.setSeverityThreshold(severityThreshold);
             mergebaseConfig.setEnableScanAll(scanAll);
             mergebaseConfig.setEnableDebugMode(debugMode);
             mergebaseConfig.setEnableJsonOutput(jsonOutput);
             mergebaseConfig.setKillBuild(killBuild);
-            mergebaseConfig.setWrapperPath(fixEmptyAndTrim(wrapperPath));
+            mergebaseConfig.setWrapperPath(fixEmptyAndTrim(getWrapperPath()));
             String tmpPath = mbScanPath;
             if(mbScanPath == null  || mbScanPath.equals("")){
                 tmpPath = ".";
             }
             mergebaseConfig.setScanPath(tmpPath);
-            mergebaseConfig.setEnableDebugMode(false);
-            mergebaseConfig.setEnableScanAll(false);
             MergeBaseRun.scanProject(genericRunContext, mergebaseConfig);
+
         } catch (MergebaseException e) {
             throw new InterruptedException(e.getLocalizedMessage());
         }
     }
 
 
-    // TODO improve validation
     @Extension
     public static final class MergebaseStepBuilderDescriptor extends BuildStepDescriptor<Builder> {
+        private String wrapperPath;
+        private String url;
+        private Secret customerToken;
+
+        @Override
+        public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+            wrapperPath = formData.getString("wrapperPath");
+            url = formData.getString("url");
+            customerToken = Secret.fromString(formData.getString("customerToken"));
+            save();
+            return super.configure(req, formData);
+        }
 
         public MergebaseStepBuilderDescriptor() {
+            super();
             load();
         }
 
@@ -216,16 +220,10 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
             return FormValidation.ok();
         }
 
-        public FormValidation doCheckCustomerToken(@QueryParameter String value) {
-            value = fixEmptyAndTrim(value);
-            if(value == null) {
-                return FormValidation.error("You must add your customer token.");
-            }
-
-            return FormValidation.ok();
-        }
-
         public FormValidation doCheckMbScanPath(@QueryParameter String value) {
+            if(value.contains("../")) {
+                return FormValidation.error("You cannot specific a path outside the current workspace.");
+            }
             return FormValidation.ok();
         }
 
@@ -239,8 +237,16 @@ public class MergebaseStepBuilder extends Builder implements SimpleBuildStep {
             return "MergeBase Build Step";
         }
 
-        public String getIconFileName() {
-            return "/plugin/mergebase-jenkins-plugin/img/mb-logo-and-name.png";
+        public String getWrapperPath() {
+            return wrapperPath;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public Secret getCustomerToken() {
+            return customerToken;
         }
     }
 }

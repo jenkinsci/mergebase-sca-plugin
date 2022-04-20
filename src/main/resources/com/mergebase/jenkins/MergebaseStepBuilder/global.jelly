@@ -1,0 +1,14 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <f:section title="MergeBase SCA Scanner">
+        <f:entry title="Download Location for Mergebase CLT JAR. If left blank, default is $HOME/.mergebase" field="wrapperPath">
+            <f:textbox />
+        </f:entry>
+        <f:entry title="MergeBase Dashboard URL" field="url">
+            <f:textbox />
+        </f:entry>
+        <f:entry title="Customer Token" field="customerToken">
+            <f:password />
+        </f:entry>
+    </f:section>
+</j:jelly>

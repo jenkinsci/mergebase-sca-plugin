@@ -3,6 +3,7 @@ package com.mergebase.jenkins;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Label;
+import hudson.util.Secret;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -26,7 +27,7 @@ public class MergebaseStepBuilderTest {
     @Test
     public void testConfigRoundtrip() throws Exception {
         String url;
-        String customerToken;
+        Secret customerToken;
         String projectName;
         String severityThreshold;
         String mbScanPath;
@@ -36,7 +37,7 @@ public class MergebaseStepBuilderTest {
         boolean killBuild;
 
         url = "https://demo.mergebase.com";
-        customerToken = "test-token";
+        customerToken = Secret.fromString("test-token");
         projectName = "mergebase-test-project";
         severityThreshold = "5.0";
         mbScanPath = ".";
@@ -46,7 +47,7 @@ public class MergebaseStepBuilderTest {
                 projectName,
                 severityThreshold,
                 mbScanPath,
-                "",
+                null,
                 false,
                 false,
                 false,
@@ -57,7 +58,7 @@ public class MergebaseStepBuilderTest {
                 projectName,
                 severityThreshold,
                 mbScanPath,
-                "",
+                null,
                 false,
                 false,
                 false,

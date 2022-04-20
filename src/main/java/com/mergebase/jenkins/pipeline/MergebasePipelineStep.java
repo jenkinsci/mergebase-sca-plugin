@@ -11,16 +11,15 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.util.Secret;
+import net.sf.json.JSONObject;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.rmi.MarshalException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,12 +28,10 @@ import static hudson.Util.fixEmptyAndTrim;
 
 public class MergebasePipelineStep  extends Step {
 
-    private String url;
-    private String customerToken;
+
     private String projectName;
     private String severityThreshold;
     private String mbScanPath;
-    private String wrapperPath;
     private boolean scanAll;
     private boolean debugMode;
     private boolean jsonOutput;
@@ -44,9 +41,6 @@ public class MergebasePipelineStep  extends Step {
     public MergebasePipelineStep() {
     }
 
-    public String getCustomerToken() {
-        return customerToken;
-    }
 
     public String getProjectName() {
         return projectName;
@@ -64,18 +58,24 @@ public class MergebasePipelineStep  extends Step {
         return debugMode;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
     public String getMbScanPath() {
         return mbScanPath;
     }
 
-    public String getWrapperPath() {
-        return wrapperPath;
+    public String getUrl() {
+        MergebasePipelineStepDescriptor mergebaseStepBuilderDescriptor = (MergebasePipelineStep.MergebasePipelineStepDescriptor) super.getDescriptor();
+        return mergebaseStepBuilderDescriptor.getUrl();
     }
 
+    public Secret getCustomerToken() {
+        MergebasePipelineStepDescriptor mergebaseStepBuilderDescriptor = (MergebasePipelineStep.MergebasePipelineStepDescriptor) super.getDescriptor();
+        return mergebaseStepBuilderDescriptor.getCustomerToken();
+    }
+
+    public String getWrapperPath() {
+        MergebasePipelineStepDescriptor mergebaseStepBuilderDescriptor = (MergebasePipelineStep.MergebasePipelineStepDescriptor) super.getDescriptor();
+        return mergebaseStepBuilderDescriptor.getWrapperPath();
+    }
     public boolean isJsonOutput() {
         return jsonOutput;
     }
@@ -84,20 +84,12 @@ public class MergebasePipelineStep  extends Step {
         return killBuild;
     }
 
-    @DataBoundSetter
-    public void setUrl(String url) {
-        this.url = url;
-    }
 
     @DataBoundSetter
     public void setMbScanPath(String mbScanPath) {
         this.mbScanPath = mbScanPath;
     }
 
-    @DataBoundSetter
-    public void setWrapperPath(String wrapperPath) {
-        this.wrapperPath = wrapperPath;
-    }
 
     @DataBoundSetter
     public void setJsonOutput(boolean jsonOutput) {
@@ -109,10 +101,6 @@ public class MergebasePipelineStep  extends Step {
         this.killBuild = killBuild;
     }
 
-    @DataBoundSetter
-    public void setCustomerToken(String customerToken) {
-        this.customerToken = customerToken;
-    }
 
     @DataBoundSetter
     public void setProjectName(String projectName) {
@@ -138,22 +126,20 @@ public class MergebasePipelineStep  extends Step {
     @Override
     public StepExecution start(StepContext stepContext) throws Exception {
         MergebaseConfig mergebaseConfig = new MergebaseConfig();
-        mergebaseConfig.setCustomerToken(customerToken);
-        mergebaseConfig.setDomain(url);
+        mergebaseConfig.setCustomerToken(getCustomerToken());
+        mergebaseConfig.setDomain(getUrl());
         mergebaseConfig.setProjectName(projectName);
         mergebaseConfig.setSeverityThreshold(severityThreshold);
         mergebaseConfig.setEnableScanAll(scanAll);
         mergebaseConfig.setEnableDebugMode(debugMode);
         mergebaseConfig.setEnableJsonOutput(jsonOutput);
         mergebaseConfig.setKillBuild(killBuild);
-        mergebaseConfig.setWrapperPath(fixEmptyAndTrim(wrapperPath));
+        mergebaseConfig.setWrapperPath(fixEmptyAndTrim(getWrapperPath()));
         String tmpPath = mbScanPath;
         if(mbScanPath == null  || mbScanPath.equals("")){
             tmpPath = ".";
         }
         mergebaseConfig.setScanPath(tmpPath);
-        mergebaseConfig.setEnableDebugMode(false);
-        mergebaseConfig.setEnableScanAll(false);
         return new Execution(stepContext, mergebaseConfig);
     }
 
@@ -177,7 +163,17 @@ public class MergebasePipelineStep  extends Step {
     @Extension
     @Symbol("mergebaseScan")
     public static class MergebasePipelineStepDescriptor extends StepDescriptor {
-        MergebaseStepBuilder mergebaseStepBuilder = new MergebaseStepBuilder();
+        private String wrapperPath;
+        private String url;
+        private Secret customerToken;
+        @Override
+        public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
+            wrapperPath = formData.getString("wrapperPath");
+            url = formData.getString("url");
+            customerToken = Secret.fromString(formData.getString("customerToken"));
+            save();
+            return super.configure(req, formData);
+        }
 
         @Override
         public Set<? extends Class<?>> getRequiredContext() {
@@ -189,7 +185,6 @@ public class MergebasePipelineStep  extends Step {
             return "mergebaseScan";
         }
 
-
         @Override
         public String getDisplayName() {
             return "Run MergeBase SCA Scan";
@@ -198,6 +193,18 @@ public class MergebasePipelineStep  extends Step {
         @Override
         public String getConfigPage() {
             return getViewPage(MergebaseStepBuilder.class, "config.jelly");
+        }
+
+        public String getWrapperPath() {
+            return wrapperPath;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public Secret getCustomerToken() {
+            return customerToken;
         }
 
     }

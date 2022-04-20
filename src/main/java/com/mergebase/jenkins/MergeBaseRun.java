@@ -5,6 +5,7 @@ import com.mergebase.jenkins.execption.MergebaseException;
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.model.Result;
 import org.springframework.security.core.parameters.P;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MergeBaseRun {
-    public static String scanProject(
+    public static Result scanProject(
             GenericRunContext context,
             MergebaseConfig mergebaseConfig
     ) throws MergebaseException, IOException {
@@ -29,18 +30,16 @@ public class MergeBaseRun {
         final String jenkinsHome = envVars.get("JENKINS_HOME");
         String wrapperDownloadPath = "";
         if(mergebaseConfig.getWrapperPath() == null) {
-            wrapperDownloadPath = jenkinsHome + "/.mergebase/wrapper";
+            wrapperDownloadPath = Paths.get(jenkinsHome, "/.mergebase/wrapper").toString();
         } else {
-            wrapperDownloadPath = mergebaseConfig.getWrapperPath();
+            wrapperDownloadPath = Paths.get(mergebaseConfig.getWrapperPath(), "/.mergebase/wrapper").toString();
         }
-
         ToolDownloader.ensureWrapperDownload(wrapperDownloadPath);
 
         final List<String> args = buildArgs(mergebaseConfig, Paths.get(wrapperDownloadPath + "/mergebase.jar"));
-        int exitCode;
+        int exitCode = -1;
         try {
-            logger.println("Testing project...");
-            logger.println("> " + args.stream().collect(Collectors.joining(" ")));
+            logger.println("Begin MergeBase Scan...");
             exitCode = launcher.launch()
                     .cmds(args)
                     //.envs(commandEnvVars)
@@ -51,16 +50,21 @@ public class MergeBaseRun {
                     .join();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+            return Result.ABORTED;
         }
-
-        return "";
+        return exitCode == 0 ? Result.SUCCESS : Result.FAILURE;
     }
 
     private static List<String> buildArgs(final MergebaseConfig mergebaseConfig, Path mergebaseJarPath) {
         List<String> args = new ArrayList<>();
         args.add("java");
-        args.add("-Dmb.customer=" + mergebaseConfig.getCustomerToken());
+        args.add("-Dmb.customer=" + mergebaseConfig.getCustomerToken().getPlainText());
         args.add("-Dmb.url=" + mergebaseConfig.getDomain());
+
+        if(mergebaseConfig.getWrapperPath() != null) {
+            args.add("-DMERGEBASE_HOME=" + mergebaseConfig.getWrapperPath());
+        }
+
         args.add("-jar");
         args.add(mergebaseJarPath.toAbsolutePath().toString());
         if(mergebaseConfig.isEnableDebugMode()) {

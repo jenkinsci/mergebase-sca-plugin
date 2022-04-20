@@ -9,9 +9,6 @@
     <f:entry title="MergeBase Dashboard URL" field="url">
         <f:textbox />
     </f:entry>
-    <f:entry title="Customer Token" field="customerToken">
-        <f:textbox />
-    </f:entry>
     <f:entry title="Scan All Projects found" field="scanAll">
         <f:checkbox />
     </f:entry>
@@ -26,8 +23,5 @@
     </f:entry>
     <f:entry title="Enable JSON output" field="jsonOutput">
         <f:checkbox />
-    </f:entry>
-    <f:entry title="Download Location for Mergebase CLT JAR. If left blank, default is $HOME/.mergebase" field="wrapperPath">
-        <f:textbox />
     </f:entry>
 </j:jelly>
