@@ -1,12 +1,6 @@
 package com.mergebase.jenkins;
 
-import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
-import hudson.model.Label;
-import hudson.util.Secret;
-import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -18,47 +12,23 @@ public class MergebaseStepBuilderTest {
     @Rule
     public JenkinsRule jenkins = new JenkinsRule();
 
-    private String url;
-    private String customerToken;
-    private String projectName;
-    private String severityThreshold;
-
-
     @Test
     public void testConfigRoundtrip() throws Exception {
-        String url;
-        Secret customerToken;
-        String projectName;
-        String severityThreshold;
-        String mbScanPath;
-        boolean scanAll;
-        boolean debugMode;
-        boolean jsonOutput;
-        boolean killBuild;
-
-        url = "https://demo.mergebase.com";
-        customerToken = Secret.fromString("test-token");
-        projectName = "mergebase-test-project";
-        severityThreshold = "5.0";
-        mbScanPath = ".";
+        String projectName = "mergebase-test-project";
+        String severityThreshold = "5.0";
+        String mbScanPath = ".";
         FreeStyleProject project = jenkins.createFreeStyleProject();
-        project.getBuildersList().add(new MergebaseStepBuilder(url,
-                customerToken,
-                projectName,
+        project.getBuildersList().add(new MergebaseStepBuilder(projectName,
                 severityThreshold,
                 mbScanPath,
-                null,
                 false,
                 false,
                 false,
                 false));
         project = jenkins.configRoundtrip(project);
-        jenkins.assertEqualDataBoundBeans(new MergebaseStepBuilder(url,
-                customerToken,
-                projectName,
+        jenkins.assertEqualDataBoundBeans(new MergebaseStepBuilder(projectName,
                 severityThreshold,
                 mbScanPath,
-                null,
                 false,
                 false,
                 false,
