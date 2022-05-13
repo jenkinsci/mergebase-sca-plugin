@@ -1,8 +1,25 @@
 # mergebase-jenkins-plugin
 
-## Introduction
+[![MergeBase](https://mergebase.com/wp-content/uploads/2020/10/logo.png)](https://mergebase.com)
 
-Scan your Source Code for vulnerabilities with MergeBase. Officially supported by MergeBase Software.
+## MergeBase Vulnerability Scanner
+MergeBase is an SCA extension (software composition analysis) that scans your applications within Jenkins. It helps your development teams identify dangerous and insecure library versions early. Your results will be displayed in your own web-based dashboard.
+
+Visit our [website](https://mergebase.com/try) to sign up or [contact us](https://mergebase.com/contact-us/) for more info.
+
+### Key Benefits
+- Supports all your DevOps languages: Javascript, Python, C#, Go, Ruby, Java, and more.
+- Don't waste time chasing false positives; Mergebase has the lowest false positive rate in the industry!
+- Sophisticated suppression management, so you can effectively pursue a zero-vuln strategy.
+- Microsoft Board integration and developer guidance to streamline your workflows.
+- Real-time notification if new vulnerabilities are uncovered in the industry, allowing you to respond to emerging threats immediately.
+- Analyses your open source licenses, enabling you to manage your legal risks.
+
+
+This pipeline extension makes integrating MergeBase SCA into your Microsoft development environment a seamless experience. It analyses your projects in place and will not upload your valuable intellectual property into the cloud.
+
+
+Contact us to find out more about run-time protection and container scanning.
 
 ## Getting started
 
@@ -40,8 +57,9 @@ Outputs the MergeBase report in JSON form for use in automation.
 In a freestyle project, add "MergeBase SCA Scan" build step. Add the required parameters as listed above.  
 
 ## Contributing
+For feature requests, open a pull request or contact delan@mergebase.com.
 
-Refer to our [contribution guidelines](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md)
+For security or vulnerability reports, email plugins@mergebase.com.
 
 ## LICENSE
 
