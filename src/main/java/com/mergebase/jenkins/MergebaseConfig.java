@@ -2,7 +2,9 @@ package com.mergebase.jenkins;
 
 import hudson.util.Secret;
 
-public class MergebaseConfig {
+import java.io.Serializable;
+
+public class MergebaseConfig implements Serializable {
     private String domain;
     private Secret customerToken;
     private String projectName;
