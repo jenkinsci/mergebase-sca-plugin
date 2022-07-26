@@ -30,7 +30,11 @@ public class ToolDownloader {
             return;
         }
         try(InputStream is = httpGet(JAR_URL, false)) {
-            folder.mkdirs();
+            final boolean mkdirs = folder.mkdirs();
+            if(mkdirs == false) {
+                // should not happen
+                LOG.error("could not access " + folder.getAbsolutePath());
+            }
             // set to actual file name
             streamToFile(is, file, false);
         } catch (Throwable e) {
